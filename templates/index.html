@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Finalyze</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    function openTab(evt, tabName) {
+      const tabs = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < tabs.length; i++) {
+        tabs[i].style.display = "none";
+        tabs[i].classList.remove("active");
+      }
+      const links = document.getElementsByClassName("tab-link");
+      for (let i = 0; i < links.length; i++) {
+        links[i].classList.remove("active");
+      }
+      document.getElementById(tabName).style.display = "block";
+      document.getElementById(tabName).classList.add("active");
+      evt.currentTarget.classList.add("active");
+
+      // Force logout when switching away from LinkedIn or Twitter
+      if (tabName !== "linkedin") {
+        fetch("/oauth/linkedin/logout");
+      }
+      if (tabName !== "twitter") {
+        fetch("/oauth/twitter/logout");
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- Video Header with Logo -->
+<div class="video-header">
+    <header class="site-header">
+        <div class="header-container">
+            <!-- Logo and Site Title -->
+            <div class="logo-title">
+                <div class="site-logo">
+                    <i class="fas fa-shield-alt" style="color: white; font-size: 24px;"></i>
+                </div>
+                <span class="site-title">Finalyze</span>
+            </div>
+
+            <!-- Mobile hamburger menu -->
+            <button class="hamburger" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Navigation -->
+            <nav class="site-navigation" id="mainNavigation">
+                <ul>
+                    <li><a href="#facebook">Facebook</a></li>
+                    <li><a href="#linkedin">LinkedIn</a></li>
+                    <li><a href="#twitter">Twitter</a></li>
+                                        </li>
+                    
+                </ul>
+            </nav>
+        </div>
+    </header>
+</div>
+
+<!-- Hero Section with Background Image -->
+<div class="hero-section">
+    <!-- Content Panel - Centered content -->
+    <div class="hero-content-panel">
+<div class="hero-text-container">
+        <div class="hero-content">
+            <h1>Streamline Your Social Media Management</h1>
+            <div class="accent-line"></div>
+            <p class="hero-subtitle">Manage all your social platforms with compliance and consistency</p>
+</div>
+            <button id="getStartedBtn" class="get-started-btn">Get Started</button>
+        </div>
+    </div>
+</div>
+
+  <div class="main-container">
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, msg in messages %}
+            <div class="flash {{ category }}">
+              <div class="flash-icon"></div>
+              <span>{{ msg }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Navigation Tabs -->
+    <div class="nav-container">
+      <nav class="tabs">
+        <button class="tab-link {% if active_tab == 'facebook' %}active{% endif %}" onclick="openTab(event,'facebook')">
+          <div class="tab-icon facebook-icon"></div>
+          <span>Facebook</span>
+        </button>
+        <button class="tab-link {% if active_tab == 'linkedin' %}active{% endif %}" onclick="openTab(event,'linkedin')">
+          <div class="tab-icon linkedin-icon"></div>
+          <span>LinkedIn</span>
+        </button>
+        <button class="tab-link {% if active_tab == 'twitter' %}active{% endif %}" onclick="openTab(event,'twitter')">
+          <div class="tab-icon twitter-icon"></div>
+          <span>Twitter</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Facebook Tab -->
+    <div id="facebook" class="tab-content {% if active_tab == 'facebook' %}active{% endif %}" style="{% if active_tab == 'facebook' %}display:block;{% else %}display:none;{% endif %}">
+      <div class="content-header">
+        <h2>Facebook Management</h2>
+        <a href="/oauth/facebook/login" class="btn btn-primary">
+          <div class="btn-icon auth-icon"></div>
+          Connect Facebook
+        </a>
+      </div>
+
+      <div class="content-body">
+        <div class="card">
+          <div class="card-header">
+            <h3>Page Analytics</h3>
+          </div>
+          <div class="card-body">
+            <form method="POST" action="/facebook/collect" class="form-inline">
+              <div class="input-group">
+                <input type="text" name="page_id" placeholder="Enter Page ID or link" value="{{ session.fb_last_page if session.fb_last_page }}" class="form-input">
+                <button type="submit" class="btn btn-secondary">Fetch Posts</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {% if all_posts %}
+          <div class="card">
+            <div class="card-header">
+              <h3>Create New Post</h3>
+            </div>
+            <div class="card-body">
+              <form method="POST" action="/facebook/create">
+                <input type="hidden" name="page_id" value="{{ session.fb_last_page }}">
+                <div class="form-group">
+                  <textarea name="message" placeholder="What's on your mind?" class="form-textarea"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  <div class="btn-icon publish-icon"></div>
+                  Publish Post
+                </button>
+              </form>
+            </div>
+          </div>
+
+          {% for pid, posts in all_posts.items() %}
+            <div class="card">
+              <div class="card-header">
+                <h3>Posts for Page: {{ pid }}</h3>
+              </div>
+              <div class="card-body">
+                <div class="posts-grid">
+                  {% for p in posts %}
+                    <div class="post-item">
+                      <div class="post-content">
+                        <p>{{ p.message }}</p>
+                        <div class="post-meta">{{ p.created_time }}</div>
+                      </div>
+                      <div class="post-status">
+                        {% if p.violations %}
+                          <div class="status-badge error">
+                            <div class="status-icon warning-icon"></div>
+                            <span>Policy Violations: {{ p.violations | join(', ') }}</span>
+                          </div>
+                        {% else %}
+                          <div class="status-badge success">
+                            <div class="status-icon check-icon"></div>
+                            <span>Compliant</span>
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div class="post-actions">
+                        <form method="POST" action="/facebook/delete" style="display:inline;">
+                          <input type="hidden" name="page_id" value="{{ pid }}">
+                          <input type="hidden" name="post_id" value="{{ p.id }}">
+                          <button class="btn btn-danger btn-sm">
+                            <div class="btn-icon delete-icon"></div>
+                            Delete
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- LinkedIn Tab -->
+    <div id="linkedin" class="tab-content {% if active_tab == 'linkedin' %}active{% endif %}" style="{% if active_tab == 'linkedin' %}display:block;{% else %}display:none;{% endif %}">
+      <div class="content-header">
+        <h2>LinkedIn Management</h2>
+        {% if not session.li_token %}
+          <a href="/oauth/linkedin/login" class="btn btn-primary">
+            <div class="btn-icon auth-icon"></div>
+            Connect LinkedIn
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="content-body">
+        {% if session.li_token %}
+          <div class="card">
+            <div class="card-header">
+              <h3>Create Professional Post</h3>
+            </div>
+            <div class="card-body">
+              <form method="POST" action="/linkedin/create">
+                <div class="form-group">
+                  <textarea name="message" placeholder="Share a professional update..." class="form-textarea"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  <div class="btn-icon publish-icon"></div>
+                  Publish to LinkedIn
+                </button>
+              </form>
+            </div>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-icon"></div>
+            <h3>Connect Your LinkedIn Account</h3>
+            <p>Link your LinkedIn profile to start managing your professional presence</p>
+          </div>
+        {% endif %}
+
+        {% if li_posts %}
+          <div class="card">
+            <div class="card-header">
+              <h3>Recent LinkedIn Posts</h3>
+            </div>
+            <div class="card-body">
+              <div class="posts-grid">
+                {% for p in li_posts %}
+                  <div class="post-item">
+                    <div class="post-content">
+                      <p>{{ p.message }}</p>
+                      <div class="post-meta">{{ p.created_time }}</div>
+                    </div>
+                    <div class="post-status">
+                      {% if p.violations %}
+                        <div class="status-badge error">
+                          <div class="status-icon warning-icon"></div>
+                          <span>Policy Violations: {{ p.violations | join(', ') }}</span>
+                        </div>
+                      {% else %}
+                        <div class="status-badge success">
+                          <div class="status-icon check-icon"></div>
+                          <span>Compliant</span>
+                        </div>
+                      {% endif %}
+                    </div>
+                    <div class="post-actions">
+                      <form method="POST" action="/linkedin/delete" style="display:inline;">
+                        <input type="hidden" name="post_id" value="{{ p.id }}">
+                        <button class="btn btn-danger btn-sm">
+                          <div class="btn-icon delete-icon"></div>
+                          Delete
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Twitter Tab -->
+    <div id="twitter" class="tab-content {% if active_tab == 'twitter' %}active{% endif %}" style="{% if active_tab == 'twitter' %}display:block;{% else %}display:none;{% endif %}">
+      <div class="content-header">
+        <h2>Twitter Management</h2>
+        {% if not session.tw_token %}
+          <a href="/oauth/twitter/login" class="btn btn-primary">
+            <div class="btn-icon auth-icon"></div>
+            Connect Twitter
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="content-body">
+        {% if session.tw_token %}
+          <div class="card">
+            <div class="card-header">
+              <h3>Compose Tweet</h3>
+            </div>
+            <div class="card-body">
+              <form method="POST" action="/twitter/create">
+                <div class="form-group">
+                  <textarea name="message" placeholder="What's happening?" class="form-textarea" maxlength="280"></textarea>
+                  <div class="character-count">0/280</div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  <div class="btn-icon publish-icon"></div>
+                  Tweet
+                </button>
+              </form>
+            </div>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-icon"></div>
+            <h3>Connect Your Twitter Account</h3>
+            <p>Link your Twitter account to start sharing your thoughts with the world</p>
+          </div>
+        {% endif %}
+
+        {% if tw_posts %}
+          <div class="card">
+            <div class="card-header">
+              <h3>Recent Tweets</h3>
+            </div>
+            <div class="card-body">
+              <div class="posts-grid">
+                {% for p in tw_posts %}
+                  <div class="post-item">
+                    <div class="post-content">
+                      <p>{{ p.message }}</p>
+                      <div class="post-meta">{{ p.created_time }}</div>
+                    </div>
+                    <div class="post-status">
+                      {% if p.violations %}
+                        <div class="status-badge error">
+                          <div class="status-icon warning-icon"></div>
+                          <span>Policy Violations: {{ p.violations | join(', ') }}</span>
+                        </div>
+                      {% else %}
+                        <div class="status-badge success">
+                          <div class="status-icon check-icon"></div>
+                          <span>Compliant</span>
+                        </div>
+                      {% endif %}
+                    </div>
+                    <div class="post-actions">
+                      <form method="POST" action="/twitter/delete" style="display:inline;">
+                        <input type="hidden" name="post_id" value="{{ p.id }}">
+                        <button class="btn btn-danger btn-sm">
+                          <div class="btn-icon delete-icon"></div>
+                          Delete
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+<!-- Professional Footer -->
+<footer style="
+  margin-top: 15px;
+  background: linear-gradient(135deg, #0b0d23, #004e98, #00aaff);
+  color: #ffffff;
+  padding: 60px 0 40px 0;
+  width: 100%;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+">
+  <div style="
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    width: 100%;
+    box-sizing: border-box;
+  ">
+    <div style="
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      margin-bottom: 40px;
+    ">
+      
+      <div style="flex: 2; min-width: 300px;">
+        <h3 style="
+          font-size: 20px;
+          font-weight: 600;
+          margin-bottom: 12px;
+          color: #ffffff;
+        ">Finalyze Compliance Technology</h3>
+        <p style="
+          font-size: 14px;
+          line-height: 1.6;
+          opacity: 0.8;
+          margin-top: 8px;
+          color: #ffffff;
+        ">Helping firms and financial professionals feel comfortable with the way they communicate, advertise, and advise their clients, families, followers, and friends.</p>
+      </div>
+      
+      <div style="flex: 1; min-width: 200px;">
+        <h4 style="
+          font-size: 16px;
+          font-weight: 600;
+          margin-bottom: 20px;
+          color: #ffffff;
+          opacity: 0.9;
+        ">Solutions</h4>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          <li style="margin-bottom: 12px;">
+            <a href="/intro" style="color: #ffffff; text-decoration: none; font-size: 14px; opacity: 0.7;">For Financial Advisors</a>
+          </li>
+          <li style="margin-bottom: 12px;">
+            <a href="/intro#benefits" style="color: #ffffff; text-decoration: none; font-size: 14px; opacity: 0.7;">For Broker-Dealers</a>
+          </li>
+          <li style="margin-bottom: 12px;">
+            <a href="/intro#benefits" style="color: #ffffff; text-decoration: none; font-size: 14px; opacity: 0.7;">For Compliance Officers</a>
+          </li>
+          <li style="margin-bottom: 12px;">
+            <a href="/intro#" style="color: #ffffff; text-decoration: none; font-size: 14px; opacity: 0.7;">Enterprise Solutions</a>
+          </li>
+        </ul>
+      </div>
+      
+      <div style="flex: 1; min-width: 200px;">
+        <h4 style="
+          font-size: 16px;
+          font-weight: 600;
+          margin-bottom: 20px;
+          color: #ffffff;
+          opacity: 0.9;
+        ">Resources</h4>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          <li style="margin-bottom: 12px;">
+            
+          </li>
+          <li style="margin-bottom: 12px;">
+            
+          </li>
+          <li style="margin-bottom: 12px;">
+            <a href="https://www.finra.org/" style="color: #ffffff; text-decoration: none; font-size: 14px; opacity: 0.7;">Compliance Guidelines</a>
+          </li>
+          <li style="margin-bottom: 12px;">
+            <a href="/doc" style="color: #ffffff; text-decoration: none; font-size: 14px; opacity: 0.7;">Documentation/Privacy</a>
+          </li>
+          <li style="margin-bottom: 12px;">
+            <a href="/disclaimer" style="color: #ffffff; text-decoration: none; font-size: 14px; opacity: 0.7;">Disclaimers</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <div style="
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    ">
+      <p style="
+        font-size: 14px;
+        opacity: 0.7;
+        margin: 0;
+        color: #ffffff;
+      ">&copy; 2025 Finalyze. All rights reserved.</p>
+      
+      <div style="display: flex; gap: 16px;">
+        <a href="#" style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 50%;
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 14px;
+        ">in</a>
+        <a href="#" style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 50%;
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 14px;
+        ">X</a>
+        <a href="#" style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 50%;
+          text-decoration: none;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 14px;
+        ">f</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <script>
+// Get Started Button functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const getStartedBtn = document.getElementById('getStartedBtn');
+    if (getStartedBtn) {
+        getStartedBtn.addEventListener('click', function() {
+            // Scroll to the main content area
+            const mainContainer = document.querySelector('.main-container');
+            if (mainContainer) {
+                const rect = mainContainer.getBoundingClientRect();
+                const scrollPosition = window.pageYOffset + rect.top - 20;
+                
+                window.scrollTo({
+                    top: scrollPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    }
+});
+
+    // Character counter for Twitter
+    document.addEventListener('DOMContentLoaded', function() {
+      const textareas = document.querySelectorAll('textarea[maxlength="280"]');
+      textareas.forEach(textarea => {
+        const counter = textarea.parentNode.querySelector('.character-count');
+        if (counter) {
+          textarea.addEventListener('input', function() {
+            const count = this.value.length;
+            counter.textContent = count + '/280';
+            counter.style.color = count > 250 ? '#dc3545' : '#6c757d';
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

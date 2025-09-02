@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalyze Blog</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+
+.back-to-blog {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .back-to-blog i {
+            margin-right: 5px;
+        }
+        
+        .back-to-blog:hover {
+            color: var(--accent);
+            transform: translateX(-5px);
+        }
+
+/* Carousel styles */
+.carousel-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+
+.carousel-track .related-post {
+    flex: 0 0 calc(33.333% - 14px);
+    margin-right: 20px;
+    text-decoration: none;
+}
+
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.carousel-button:hover {
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.carousel-button.prev {
+    left: 10px;
+}
+
+.carousel-button.next {
+    right: 10px;
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 8px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ccc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dot.active {
+    background-color: var(--primary);
+    transform: scale(1.2);
+}
+
+@media (max-width: 768px) {
+    .carousel-track .related-post {
+        flex: 0 0 calc(100% - 40px);
+    }
+}
+
+
+
+        /* Base styles */
+        :root {
+            --primary: #0056b3;
+            --secondary: #00386b;
+            --accent: #00aaff;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0b0d23, #004e98, #00aaff);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+            min-height: 110vh;
+        }
+
+        /* Header and Navigation styles */
+        header {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 0;
+            position: relative;
+            z-index: 100;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(0, 170, 255, 0.5);
+        }
+
+        .logo-icon i {
+            color: white;
+            font-size: 20px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .login-button {
+            background-color: transparent;
+            color: white;
+            border: 1px solid white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-left: 15px;
+        }
+        
+        .login-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .cta-button {
+            background: linear-gradient(45deg, var(--accent), var(--primary));
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+            display: inline-block;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+        }
+        
+        .hamburger {
+            display: none;
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        /* Disclosure header image styling */
+        .disclosure-header-image {
+            position: relative;
+            width: 100vw;
+            height: 400px;
+            overflow: hidden;
+            margin-top: 0; /* Changed from -40px to 0 */
+            margin-left: calc(-50vw + 50%);
+            margin-right: calc(-50vw + 50%);
+            margin-bottom: 0;
+        }
+
+        .disclosure-header-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.6);
+        }
+
+        .image-text-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-text-overlay h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+            padding: 0 20px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main content styles */
+        .main-content-container {
+            max-width: 1200px;
+            position: relative;
+            padding: 0px;
+            margin: -115px auto; /* Changed from -115px to 40px */
+	    margin-bottom: 100px !important;
+        }
+
+        .blog-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin-bottom: 50px;
+        }
+
+        .blog-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .blog-header h2 {
+            font-size: 32px;
+            color: #19344f;
+            margin-bottom: 10px;
+        }
+
+        .blog-meta {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .blog-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .blog-content {
+            line-height: 1.8;
+            color: #444;
+            font-size: 16px;
+        }
+
+        .blog-content p {
+            margin-bottom: 20px;
+        }
+
+        .blog-content h3 {
+            font-size: 24px;
+            color: #19344f;
+            margin: 30px 0 15px;
+        }
+
+        .author-section {
+            display: flex;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+
+        .author-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        .author-info h4 {
+            margin: 0 0 5px;
+            color: #19344f;
+        }
+
+        .author-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .related-posts {
+            margin-top: 50px;
+        }
+
+        .related-posts h3 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #19344f;
+        }
+
+        .related-posts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .related-post {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .related-post:hover {
+            transform: translateY(-5px);
+        }
+
+        .related-post img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .related-post-content {
+            padding: 15px;
+        }
+
+        .related-post-content h4 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #19344f;
+        }
+
+        .related-post-content p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Footer styles */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 3rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 0.7rem;
+        }
+        
+        .footer-column ul li a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column ul li a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 20px;
+                gap: 15px;
+                z-index: 100;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .nav-links a {
+                padding: 12px;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .cta-button {
+                display: none;
+            }
+            
+            .login-button {
+                display: inline-block;
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .disclosure-header-image {
+                height: 300px;
+            }
+            
+            .image-text-overlay h1 {
+                font-size: 28px;
+            }
+            
+            .main-content-container {
+                margin-top: 20px;
+            }
+            
+            .blog-container {
+                padding: 20px;
+            }
+            
+            .blog-header h2 {
+                font-size: 26px;
+            }
+            
+            .blog-image {
+                height: 250px;
+            }
+            
+            .related-posts-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .author-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .author-image {
+                margin: 0 0 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    Finalyze
+                </a>
+                <button class="hamburger" id="hamburgerMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="nav-links" id="navLinks">
+                    <a href="/intro#features">Features</a>
+                    <a href="/intro#benefits">Benefits</a>
+                    <a href="/intro#compliance">Compliance</a>
+                    <a href="/intro#contact">Contact</a>
+                    
+                </div>
+                <a href="https://calendly.com/complianceadvisor360-info/schedule-a-demo" class="cta-button">Schedule Demo</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Header Image with Title Overlay -->
+    <div class="disclosure-header-image">
+        <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Compliance blog header image">
+        <div class="image-text-overlay">
+            <h1>Challenges Facing Financial Advisors</h1>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="main-content-container">
+
+        <div class="blog-container">
+    
+    
+    <!-- Blog Header -->
+    <div class="blog-header">
+        <h2>5 Compliance Challenges Facing Financial Advisors in 2025</h2>
+        <div class="blog-meta">
+
+        
+                    <span><i class="far fa-calendar-alt"></i> April 15, 2025</span> | 
+                   
+                    <span><i class="far fa-folder"></i> Compliance, Regulations</span>
+                </div>
+            </div>
+            
+            <!-- Blog Featured Image -->
+            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Financial advisor working at desk" class="blog-image">
+            
+            <!-- Blog Content -->
+            <div class="blog-content">
+                <p>The compliance landscape for financial advisors continues to evolve at a rapid pace. As we move further into 2025, new regulations, technological advancements, and changing client expectations are creating both challenges and opportunities for financial professionals.</p>
+                
+                <p>In this article, we'll explore five of the most significant compliance challenges that financial advisors are facing this year and provide practical strategies to address them effectively.</p>
+                
+                <h3>1. Increased Scrutiny of Digital Marketing and Social Media</h3>
+                
+                <p>With more advisors leveraging digital channels to connect with clients, regulators have intensified their focus on digital marketing compliance. Recent SEC amendments now require firms to review and archive all client communications across platforms, including social media, text messages, and even messaging apps.</p>
+                
+                <p>To navigate this challenge, advisors should:</p>
+                <ul>
+                    <li>Implement comprehensive archiving solutions that capture all digital communications</li>
+                    <li>Establish clear social media policies and provide regular training</li>
+                    <li>Consider using compliance-focused tools that can pre-screen posts before publication</li>
+                    <li>Conduct regular audits of digital marketing materials</li>
+                </ul>
+                
+                <h3>2. Evolution of Reg BI Implementation</h3>
+                
+                <p>While Regulation Best Interest (Reg BI) has been around for several years now, regulators continue to refine their expectations and enforcement approaches. In particular, documentation of the recommendation process has become a critical focus area.</p>
+                
+                <p>Financial advisors need to:</p>
+                <ul>
+                    <li>Strengthen their processes for documenting the basis of recommendations</li>
+                    <li>Ensure fee and compensation disclosures are clear, complete, and prominently displayed</li>
+                    <li>Regularly review and update their Form CRS</li>
+                    <li>Maintain robust records of client interactions and decision-making processes</li>
+                </ul>
+                
+                <h3>3. Cybersecurity and Data Privacy Compliance</h3>
+                
+                <p>The financial industry remains a prime target for cyber attacks, and new privacy regulations at both federal and state levels have created a complex compliance environment for advisors who handle sensitive client data.</p>
+                
+                <p>Important steps for addressing these challenges include:</p>
+                <ul>
+                    <li>Implementing multi-factor authentication across all systems</li>
+                    <li>Conducting regular vulnerability assessments and penetration testing</li>
+                    <li>Developing and testing an incident response plan</li>
+                    <li>Providing ongoing cybersecurity awareness training for all team members</li>
+                    <li>Ensuring vendor management includes robust security assessments</li>
+                </ul>
+                
+                <h3>4. ESG Disclosure Requirements</h3>
+                
+                <p>Environmental, Social, and Governance (ESG) investing continues to gain traction, but recent regulatory changes have created new disclosure requirements and standards for advisors who incorporate ESG factors into their investment strategies.</p>
+                
+                <p>Financial advisors should:</p>
+                <ul>
+                    <li>Develop a clear, consistent process for evaluating ESG factors</li>
+                    <li>Ensure marketing materials accurately reflect the role of ESG in investment decisions</li>
+                    <li>Stay updated on evolving ESG reporting requirements</li>
+                    <li>Maintain documentation of ESG-related research and decision-making</li>
+                </ul>
+                
+                <h3>5. Cryptocurrency and Digital Asset Regulations</h3>
+                
+                <p>As more clients express interest in cryptocurrencies and digital assets, advisors must navigate an evolving regulatory landscape. Recent guidance from regulators has clarified some aspects of compliance, but many areas remain in flux.</p>
+                
+                <p>To stay compliant while serving clients interested in digital assets:</p>
+                <ul>
+                    <li>Develop clear policies regarding cryptocurrency recommendations and advice</li>
+                    <li>Ensure proper disclosures regarding risks and volatility</li>
+                    <li>Stay informed about evolving regulatory guidance</li>
+                    <li>Consider specialized training on digital asset compliance</li>
+                </ul>
+                
+                <p>The compliance landscape will continue to evolve, but advisors who take a proactive approach to these challenges can protect their practices while providing valuable service to their clients. By leveraging technology solutions, staying informed about regulatory changes, and maintaining robust documentation practices, financial advisors can navigate the complex compliance environment of 2025 and beyond.</p>
+                
+                <!-- Author Section -->
+                <div class="author-section">
+                    
+                    <div class="author-info">
+                        
+                    </div>
+                </div>
+            </div>
+
+
+	    <!-- Related Posts Section with Carousel -->
+<div class="related-posts">
+    <h3>Related Articles</h3>
+    <div class="carousel-container">
+        <div class="carousel-track" id="relatedPostsTrack">
+            <a href="/blog/sec-marketing-rule" class="related-post">
+                <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="SEC regulations">
+                <div class="related-post-content">
+                    <h4>SEC's New Marketing Rule: What Advisors Need to Know</h4>
+                    <p>March 28, 2025 | 8 min read</p>
+                </div>
+            </a>
+            
+            <a href="/blog/cryptocurrency-compliance" class="related-post">
+                <img src="https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Cryptocurrency compliance">
+                <div class="related-post-content">
+                    <h4>Cryptocurrency Compliance: A Framework for Advisors</h4>
+                    <p>April 2, 2025 | 12 min read</p>
+                </div>
+            </a>
+            
+            <a href="/blog/social-media-strategy" class="related-post">
+                <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Social media compliance">
+                <div class="related-post-content">
+                    <h4>Building a Compliant Social Media Strategy</h4>
+                    <p>March 15, 2025 | 10 min read</p>
+                </div>
+            </a>
+            
+            <a href="/blog/why" class="related-post">
+                <img src="https://images.unsplash.com/photo-1579869847514-7c1a19d2d2ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Why Social Media Compliance Matters">
+                <div class="related-post-content">
+                    <h4>Navigating Social Media Compliance: Challenges and Solutions</h4>
+                    <p>April 12, 2025 | 11 min read</p>
+                </div>
+            </a>
+        </div>
+        
+        <button class="carousel-button prev" id="prevButton"><i class="fas fa-chevron-left"></i></button>
+        <button class="carousel-button next" id="nextButton"><i class="fas fa-chevron-right"></i></button>
+        
+        <div class="carousel-dots" id="carouselDots">
+            <span class="dot active" data-index="0"></span>
+            <span class="dot" data-index="1"></span>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+            
+            
+    <!-- Footer -->
+    <footer>
+        
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 Finalyze. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            document.getElementById('hamburgerMenu').addEventListener('click', function() {
+                document.getElementById('navLinks').classList.toggle('active');
+            });
+            
+            // Close menu when a link is clicked
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', function() {
+                    document.getElementById('navLinks').classList.remove('active');
+                });
+            });
+            
+            // Add smooth scrolling for footer links
+            document.getElementById('advisorLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const featuresSection = document.getElementById('features');
+                
+                if (featuresSection) {
+                    featuresSection.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+
+            document.getElementById('brokerDealerLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const benefitsSection = document.getElementById('benefits');
+                
+                if (benefitsSection) {
+                    benefitsSection.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+
+            document.getElementById('complianceOfficerLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const benefitsSection = document.getElementById('benefits');
+                
+                if (benefitsSection) {
+                    benefitsSection.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+// Carousel functionality
+const track = document.getElementById('relatedPostsTrack');
+const nextButton = document.getElementById('nextButton');
+const prevButton = document.getElementById('prevButton');
+const dots = document.querySelectorAll('.dot');
+let currentIndex = 0;
+const slideWidth = 100;
+const slidesPerView = window.innerWidth <= 768 ? 1 : 3;
+const slideCount = Math.ceil(track.children.length / slidesPerView);
+
+function goToSlide(index) {
+    if (index < 0) {
+        index = 0;
+    } else if (index >= slideCount) {
+        index = slideCount - 1;
+    }
+    
+    currentIndex = index;
+    track.style.transform = `translateX(-${currentIndex * slideWidth}%)`;
+    
+    // Update dots
+    dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentIndex);
+    });
+}
+
+nextButton.addEventListener('click', () => {
+    goToSlide(currentIndex + 1);
+});
+
+prevButton.addEventListener('click', () => {
+    goToSlide(currentIndex - 1);
+});
+
+dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+        goToSlide(parseInt(dot.dataset.index));
+    });
+});
+
+// Initialize carousel
+goToSlide(0);
+
+// Handle window resize
+window.addEventListener('resize', () => {
+    const newSlidesPerView = window.innerWidth <= 768 ? 1 : 3;
+    if (newSlidesPerView !== slidesPerView) {
+        location.reload(); // Simple reload to recalculate everything
+    }
+});
+
+
+
+    </script>
+</body>
+</html>
